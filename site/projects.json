@@ -1,0 +1,10 @@
+[
+  {"name":"konaet-cover","title":"KONAET Cover","category":"Sistemas","label":"PROTEÇÃO & AUDITORIA","description":"Proteção de dispositivos, simulação de risco e auditoria causal em uma plataforma experimental.","art":"cover","color":"violet"},
+  {"name":"IA_Neural","title":"IA Neural","category":"IA","label":"APRENDA EXPERIMENTANDO","description":"Treine uma rede, observe a fronteira de decisão e explore o aprendizado no navegador.","art":"neural","color":"mint","demo":"https://7dsolv.github.io/IA_Neural/"},
+  {"name":"konaet-os","title":"KONAET Horizon","category":"Sistemas","label":"DO KERNEL AO DESKTOP","description":"Sistema operacional experimental x86-64/UEFI. Arquitetura, código e documentação abertos à exploração.","art":"horizon","color":"blue"},
+  {"name":"RealidadeQuantica","title":"Realidade Quântica","category":"Ciência","label":"FÍSICA ENCONTRA COMPUTAÇÃO","description":"Modelos científicos, pesquisa TinyML INT8 e projetos KiCad e SystemVerilog. Hardware físico em validação futura.","art":"quantum","color":"coral"},
+  {"name":"konaet-bot","title":"KONAET Bot","category":"Ferramentas","label":"AUTOMAÇÃO COM IDENTIDADE","description":"GitHub App e Action para identidade autenticada, alterações revisáveis e propostas por pull request.","art":"bot","color":"violet"},
+  {"name":"konaet-xray","title":"KONAET X-Ray","category":"Ferramentas","label":"OLHE ALÉM DO CÓDIGO","description":"Explore riscos, evidências e prioridades antes de assumir um repositório.","art":"xray","color":"mint","demo":"https://7dsolv.github.io/konaet-xray/"},
+  {"name":"AGIMatematic","title":"AGIMatematic","category":"IA","label":"RACIOCÍNIO EM CONSTRUÇÃO","description":"Matemática verificável para atenção, memória, aprendizado e decisão, com código e testes.","art":"math","color":"blue"},
+  {"name":"matematic-latex-github","title":"Caderno de matemática","category":"Ciência","label":"FÓRMULAS, CÓDIGO & IDEIAS","description":"Matemática, física, IA e LaTeX com fórmulas e notebooks executáveis.","art":"math","color":"coral"}
+]
