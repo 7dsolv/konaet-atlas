@@ -1,6 +1,7 @@
 from pathlib import Path
 from html.parser import HTMLParser
 import json,re,xml.etree.ElementTree as ET
+from urllib.parse import urlsplit
 ROOT=Path(__file__).resolve().parents[1]
 class Links(HTMLParser):
     def __init__(self):super().__init__();self.ids=[];self.links=[]
@@ -15,7 +16,7 @@ def main():
     out=ROOT/'dist';p=Links();p.feed((out/'index.html').read_text(encoding='utf-8'));assert len(p.ids)==len(set(p.ids))
     for link in p.links:
         if link.startswith('#'):assert link[1:] in p.ids,link
-        elif not link.startswith('https://'):assert (out/link).is_file(),link
+        elif not link.startswith('https://'):assert (out/urlsplit(link).path).is_file(),link
     source=(out/'studio.js').read_text(encoding='utf-8')
     css=(out/'studio.css').read_text(encoding='utf-8')
     for link in re.findall(r'url\([\'\"]?([^\)\'\"]+)',css):assert (out/link).is_file(),link
@@ -24,7 +25,13 @@ def main():
     for path in [out/'index.html',out/'studio.css',out/'studio.js']:
         assert '\ufffd' not in path.read_text(encoding='utf-8'),path
     for id in re.findall(r"\$\(['\"]#([\w-]+)['\"]\)",source):assert id in p.ids,id
-    assert 'innerHTML' not in source and 'eval(' not in source
+    music=(out/'music.js').read_text(encoding='utf-8')
+    assert all('innerHTML' not in s and 'eval(' not in s for s in (source,music))
+    assert not re.search(r'\b\d{6,}:[A-Za-z0-9_-]{25,}',source+music+css)
+    catalog=json.loads((out/'music/catalog.json').read_text(encoding='utf-8'))
+    assert catalog['schema']==1 and len(catalog['tracks'])<=250
+    for track in catalog['tracks']:
+        assert track['url'].startswith('https://github.com/7dsolv/konaet-atlas/releases/download/pairbeat-')
     names={p['name'] for p in json.loads((out/'data/github.json').read_text(encoding='utf-8'))['repos']}
     for project in json.loads((out/'projects.json').read_text(encoding='utf-8')):assert project['name'] in names;assert (out/'art'/(project['art']+'.svg')).is_file()
     for path in (out/'art').glob('*.svg'):ET.parse(path)

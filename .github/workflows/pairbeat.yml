@@ -1,0 +1,32 @@
+name: Sync PairBeat music
+on:
+  schedule:
+    - cron: '3-58/5 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pairbeat-ingestion
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Import owner-approved Telegram audio
+        run: python integrations/pairbeat_sync.py
+        env:
+          PAIRBEAT_BOT_TOKEN: ${{ secrets.PAIRBEAT_BOT_TOKEN }}
+          PAIRBEAT_LINK_CODE: ${{ secrets.PAIRBEAT_LINK_CODE }}
+          PAIRBEAT_OWNER_KEY: ${{ secrets.PAIRBEAT_OWNER_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}

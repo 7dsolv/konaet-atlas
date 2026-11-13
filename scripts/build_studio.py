@@ -4,6 +4,7 @@ import argparse
 import json
 import shutil
 import urllib.request
+import hashlib
 from datetime import datetime, timezone
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -28,6 +29,11 @@ def build():
     shutil.copyfile(ROOT/'assets/publication-engineering-guide.svg',out/'art/guide.svg')
     shutil.copyfile(ROOT/'assets/publication-technical-manual.svg',out/'art/manual.svg')
     shutil.copyfile(ROOT/'assets/studio/avatar.png',out/'avatar.png')
+    html=(out/'index.html').read_text(encoding='utf-8')
+    for asset in ('studio.css','studio.js','music.js'):
+        digest=hashlib.sha256((out/asset).read_bytes()).hexdigest()[:12]
+        html=html.replace('"'+asset+'"','"'+asset+'?v='+digest+'"')
+    (out/'index.html').write_text(html,encoding='utf-8',newline='\n')
     (out/'.nojekyll').touch()
     print('Built KONAET Studio in dist/ (static, no backend).')
 

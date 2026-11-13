@@ -3,3 +3,5 @@ dist/
 artifacts/
 __pycache__/
 .openai/
+.env
+.env.*
