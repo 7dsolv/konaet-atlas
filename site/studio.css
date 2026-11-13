@@ -9,3 +9,11 @@
 @media(prefers-reduced-transparency:reduce){.glass,.glass-lite,.map-node{backdrop-filter:none;background:#e0e6e5}html[data-theme=dark] .glass,html[data-theme=dark] .map-node{background:#263a40}}
 
 @media(max-width:560px){.map-node{top:calc(var(--y) * .855%)!important}}
+
+/* Let the material preview follow its container instead of the HTML height hint. */
+.project-art{height:auto}
+.core-cube{transform:none;background:url('art/mark.svg') center/contain no-repeat;height:50px;filter:brightness(.4) saturate(.5);margin-bottom:2px}
+.core-cube span{display:none}
+html[data-theme=dark] .core-cube{filter:none}
+@media(min-width:561px){.rail small{font-size:9px}.map-node strong{font-size:clamp(10px,.85vw,14px)}.detail>p{font-size:12px}.detail dl{font-size:9px}}
+@media(min-width:561px) and (max-width:1150px){.core-cube{transform:scale(.75);margin-bottom:-8px}}
