@@ -9,6 +9,23 @@ Arquivos locais não são enviados. A demonstração é um arpejo sintetizado de
 publicados pelo proprietário vinculado; não representam acesso ao histórico
 inteiro da sua conta do Telegram.
 
+Para trazer músicas antigas de outras conversas ou de Mensagens Salvas,
+encaminhe os arquivos para o PairBeat pela conta vinculada. A Bot API não dá
+acesso retroativo a todo o histórico pessoal da conta.
+
+O player permanece no mesmo documento ao navegar entre Projetos, Mapa,
+Música, Caderno e Perfil. A atualização automática do catálogo preserva a
+faixa e a posição de reprodução. Trocar para outra aba não envia um comando
+de pausa; fechar ou sair da aba do Atlas encerra seu contexto de áudio.
+O sistema operacional ainda pode suspender a reprodução em segundo plano.
+
+Quando disponível, a API Media Session oferece título/artista e controles
+de reprodução do navegador, teclado de mídia e tela bloqueada. A última
+faixa pública e sua posição ficam no armazenamento local. Ao reabrir, a
+faixa é preparada em pausa, respeitando as regras de autoplay. Arquivos
+locais precisam ser escolhidos novamente; o site não guarda suas permissões
+de acesso ao disco nem copia os arquivos para a nuvem.
+
 ## Fluxo da biblioteca
 
 1. O proprietário abre o link de vínculo recebido na configuração e toca em
@@ -54,10 +71,67 @@ A sincronização está agendada a cada cinco minutos. O GitHub pode atrasar
 execuções agendadas; o fluxo não promete publicação instantânea. Também é
 possível executar **Sync PairBeat music → Run workflow** manualmente.
 
-O coletor aceita mensagens do tipo **audio**, com contêiner MP3, M4A, OGG ou
+O coletor aceita mensagens do tipo **audio** e documentos com extensão de
+música, com contêiner MP3, M4A, OGG ou
 WAV reconhecido pelo conteúdo. A implementação limita cada importação a 20 MiB,
-de acordo com o limite de download da API de nuvem do Telegram. Arquivos enviados
-como documento ou mensagem de voz não são importados por este coletor.
+de acordo com o limite de download da API de nuvem do Telegram. O contêiner é
+validado pelo conteúdo; renomear um programa para `.mp3` não o torna válido.
+Mensagens de voz não são importadas automaticamente por este coletor.
+
+## Identificação das faixas
+
+O navegador lê título, artista e álbum dos metadados do arquivo. Um SHA-256
+permite reconhecer o mesmo arquivo já presente no catálogo ou na fila local,
+mesmo com outro nome. Essa identificação de duplicadas compara bytes, não
+gravações acusticamente parecidas.
+
+O coletor também lê metadados internos com Mutagen. Na ausência deles, usa
+os campos do Telegram e, por último, o nome do arquivo, registrando o método
+usado no catálogo. Isso não constitui reconhecimento pelo som.
+
+Há um adaptador para identificação acústica com Chromaprint/AcoustID. Ele
+fica desativado sem o Secret `ACOUSTID_API_KEY`. Para ativá-lo, registre sua
+aplicação no serviço e configure essa chave no repositório. O workflow
+instalará `fpcalc` somente quando houver chave. Ele envia uma impressão
+acústica e duração, sem enviar o arquivo original ao AcoustID. Resultados
+ambíguos ou com pontuação baixa não substituem os metadados existentes.
+
+Essa integração depende da base de referência e dos termos do serviço;
+não há garantia de reconhecer qualquer música ou trecho ruidoso curto.
+A ativação e validação com uma chave própria continuam necessárias.
+
+## Processo contínuo em um host próprio
+
+O agendamento no GitHub permanece ativo por padrão. O código
+`integrations/pairbeat_service.py` fornece uma alternativa contínua, com
+reinício pelo Docker, espera progressiva após falhas e indicador de saúde.
+Ele não está hospedado automaticamente e não transforma um job do Actions
+em um servidor permanente.
+
+Para usar essa alternativa em um servidor que fique ligado:
+
+1. Prepare as variáveis no gerenciador de segredos do host. O modelo está em
+   `deploy/pairbeat.env.example`; nunca inclua valores reais em um commit.
+2. Use uma credencial restrita ao repositório para o processo externo, com
+   escrita de Contents e Actions e leitura de Variables. O token temporário
+   de um job do Actions não serve como credencial permanente do host.
+3. Defina a variável do repositório `PAIRBEAT_RUN_MODE=continuous`. O coletor
+   agendado passará a ignorar os ciclos, para não disputar o mesmo bot.
+4. Suba **uma única instância**:
+
+```sh
+docker compose -f deploy/compose.pairbeat.yml up -d --build
+docker compose -f deploy/compose.pairbeat.yml logs --tail=30
+```
+
+Os Secrets já existentes não podem ser recuperados em texto pela API do
+GitHub. Use a gestão de segredos da implantação para injetar os mesmos
+valores no host. Alterar `PAIRBEAT_OWNER_KEY` exige refazer o vínculo do
+proprietário; não substitua essa chave durante uma migração normal.
+
+Para voltar aos ciclos do GitHub, pare primeiro o serviço e remova a
+variável `PAIRBEAT_RUN_MODE` ou use o valor `scheduled`. O serviço contínuo
+verifica esse modo e para quando ele não está habilitado.
 
 Esta biblioteca pessoal comporta até 250 faixas; GitHub Releases fornece a
 distribuição dos arquivos. Não é um serviço de streaming com SLA, nem uma nuvem
@@ -72,6 +146,7 @@ workflow. O coletor não tenta tomar o controle de uma integração existente.
 ## Verificação e recuperação
 
 ```sh
+python -m pip install --require-hashes -r integrations/requirements.txt
 python -m unittest discover -s tests -p "test_*.py"
 node --test tests/atlas.test.mjs tests/music.test.mjs
 ```
@@ -80,7 +155,9 @@ Os testes cobrem vínculo, remetentes não autorizados, duplicações, limites d
 arquivo, caminhos inválidos, preservação de webhook, falha de download e
 recuperação após falhas de gravação ou publicação. Não enviam mensagens reais.
 Os testes de DOM usam um player simulado; a decodificação e saída sonora reais
-dependem do navegador e do dispositivo.
+dependem do navegador e do dispositivo. Também são testados continuidade ao
+navegar/atualizar o catálogo, controles Media Session, restauração em pausa,
+ID3 real e identificação de duplicadas por conteúdo.
 
 O cursor só avança depois que o processamento durável termina. Uma falha
 temporária deixa a atualização para nova tentativa. A solicitação de

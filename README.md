@@ -6,6 +6,8 @@ Projetos, código e pesquisa de Adilson Oliveira em uma interface de vidro claro
 
 A área [Música](https://7dsolv.github.io/konaet-atlas/#music) permite ouvir arquivos locais, um estudo original de demonstração e faixas publicadas pelo PairBeat após vincular o proprietário. Veja [o fluxo, a configuração e os limites](docs/PAIRBEAT.md). A interface tem temas branco/preto de alto contraste, navegação com rótulos maiores e um mapa adaptado para celular.
 
+O player fica fixo enquanto você navega pelo Atlas. O catálogo do Telegram é atualizado automaticamente, sem reiniciar a reprodução. Arquivos locais têm título/artista lidos dos metadados e duplicadas verificadas pelo conteúdo. A reprodução termina ao fechar a aba do Atlas; ao reabrir, a última faixa pública fica pronta para continuar com um toque em play.
+
 O portal é publicado no **GitHub Pages**, a partir deste repositório público. A página funciona como aplicação estática, sem conta, servidor de IA ou credenciais. Os desenhos são estudos visuais dos projetos; o estado e os resultados de cada projeto estão nos respectivos repositórios.
 
 ## Executar no computador
@@ -40,7 +42,7 @@ node --test atlas.test.mjs music.test.mjs
 
 Cobrem seleção e links dos projetos, busca e categorias, navegação entre áreas, salvos, zoom, tema, biblioteca e recuperação de falhas. `scripts/check_atlas.py` verifica os recursos locais, IDs do DOM, SVGs e orçamento de 1,3 MB para toda a distribuição, incluindo PDFs.
 
-Os testes do coletor são executados na raiz: `python -m unittest discover -s tests -p "test_*.py"`. Não requerem credenciais e não fazem chamadas reais ao Telegram.
+Os testes do coletor são executados na raiz, após `python -m pip install --require-hashes -r integrations/requirements.txt`: `python -m unittest discover -s tests -p "test_*.py"`. Não requerem credenciais e não fazem chamadas reais ao Telegram. Consulte também [as dependências de áudio](docs/AUDIO-DEPENDENCIES.md).
 
 Os testes de DOM verificam comportamento; não substituem inspeção visual em um navegador real. O layout tem adaptações para celular, tablet e computador, foco visível e preferências de redução de movimento e transparência.
 

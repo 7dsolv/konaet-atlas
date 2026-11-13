@@ -5,3 +5,4 @@ __pycache__/
 .openai/
 .env
 .env.*
+deploy/.env.pairbeat

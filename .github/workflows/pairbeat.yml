@@ -10,6 +10,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   sync:
+    if: vars.PAIRBEAT_RUN_MODE != 'continuous'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     permissions:
@@ -23,6 +24,16 @@ jobs:
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.12'
+      - name: Install pinned metadata reader
+        run: python -m pip install --require-hashes -r integrations/requirements.txt
+      - name: Install optional acoustic recognition engine
+        env:
+          ACOUSTID_KEY: ${{ secrets.ACOUSTID_API_KEY }}
+        run: |
+          if [ -n "$ACOUSTID_KEY" ]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y libchromaprint-tools
+          fi
       - name: Import owner-approved Telegram audio
         run: python integrations/pairbeat_sync.py
         env:
@@ -30,3 +41,4 @@ jobs:
           PAIRBEAT_LINK_CODE: ${{ secrets.PAIRBEAT_LINK_CODE }}
           PAIRBEAT_OWNER_KEY: ${{ secrets.PAIRBEAT_OWNER_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
+          ACOUSTID_API_KEY: ${{ secrets.ACOUSTID_API_KEY }}

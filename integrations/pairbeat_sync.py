@@ -14,6 +14,10 @@ from datetime import datetime, timezone
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, build_opener, HTTPRedirectHandler
+try:
+    from .audio_recognition import recognize
+except ImportError:
+    from audio_recognition import recognize
 
 MAX_AUDIO = 20 * 1024 * 1024
 CATALOG_PATH = 'site/music/catalog.json'
@@ -80,6 +84,15 @@ def title(value, fallback, maximum=160):
     return ''.join(c for c in str(value or fallback) if c.isprintable()).strip()[:maximum] or fallback
 
 
+def audio_attachment(message):
+    if isinstance(message.get('audio'), dict):
+        return message['audio']
+    document = message.get('document')
+    if isinstance(document, dict) and re.search(r'\.(mp3|m4a|ogg|wav)$', document.get('file_name', ''), re.I):
+        return document
+    return None
+
+
 class Telegram:
     def __init__(self, token):
         if not isinstance(token, str) or not re.fullmatch(r'\d+:[A-Za-z0-9_-]+', token):
@@ -98,9 +111,12 @@ class Telegram:
     def download(self, audio):
         if not isinstance(audio, dict) or not re.fullmatch(r'[\w-]{1,512}', audio.get('file_id', '')):
             raise InvalidAudio('Invalid audio reference')
-        if audio.get('file_size', MAX_AUDIO + 1) > MAX_AUDIO:
+        declared = audio.get('file_size')
+        if declared is not None and (not isinstance(declared, int) or not 0 < declared <= MAX_AUDIO):
             raise InvalidAudio('Audio exceeds Telegram cloud download limit')
         info = self.call('getFile', {'file_id': audio['file_id']})
+        if info.get('file_size', 0) > MAX_AUDIO:
+            raise InvalidAudio('Audio exceeds Telegram cloud download limit')
         path = info.get('file_path', '')
         if not re.fullmatch(r'[A-Za-z0-9_./-]{1,1024}', path) or any(p in ('', '.', '..') for p in path.split('/')):
             raise SyncError('Telegram returned an invalid file path')
@@ -182,7 +198,7 @@ def synchronize(tg, gh, code, owner_key):
     if state.get('schema') != 1 or catalog.get('schema') != 1 or not isinstance(catalog.get('tracks'), list) or len(catalog['tracks']) > 250:
         raise SyncError('Incompatible catalog or collector state')
     original_state, original_catalog = json.dumps(state, sort_keys=True), json.dumps(catalog, sort_keys=True)
-    updates = tg.call('getUpdates', {'offset': state['next_update_id'], 'limit': 100, 'timeout': 0, 'allowed_updates': ['message']})
+    updates = tg.call('getUpdates', {'offset': state['next_update_id'], 'limit': 5 if os.getenv('ACOUSTID_API_KEY') else 10, 'timeout': 0, 'allowed_updates': ['message']})
     counts = {'published': 0, 'rejected': 0, 'linked': False}
     pending_error = None
     for update in updates:
@@ -198,18 +214,19 @@ def synchronize(tg, gh, code, owner_key):
             state['publish_pending'] = True
             catalog['provider']['connected'] = True
             counts['linked'] = True
-        elif private and owner and hmac.compare_digest(owner, fingerprint(chat_id, owner_key)) and 'audio' in message:
+        elif private and owner and hmac.compare_digest(owner, fingerprint(chat_id, owner_key)) and audio_attachment(message):
             try:
-                data = tg.download(message['audio'])
+                a = audio_attachment(message)
+                data = tg.download(a)
                 digest = hashlib.sha256(data).hexdigest()
                 track_id = digest[:24]
                 if not any(t['id'] == track_id for t in catalog['tracks']):
                     if len(catalog['tracks']) >= 250:
                         raise InvalidAudio('Library capacity reached')
-                    a = message['audio']
-                    track_title = title(a.get('title'), title(a.get('file_name'), 'Faixa PairBeat'))
+                    info = recognize(data, a)
+                    track_title = info['title']
                     url = gh.publish_audio(track_id, data, track_title)
-                    catalog['tracks'].append({'id': track_id, 'title': track_title, 'artist': title(a.get('performer'), 'PairBeat', 100), 'duration': a.get('duration') if isinstance(a.get('duration'), int) else None, 'url': url, 'sha256': digest})
+                    catalog['tracks'].append({'id': track_id, **info, 'url': url, 'sha256': digest})
                     counts['published'] += 1
                 state['publish_pending'] = True
             except InvalidAudio:

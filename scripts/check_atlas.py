@@ -1,6 +1,7 @@
 from pathlib import Path
 from html.parser import HTMLParser
 import json,re,xml.etree.ElementTree as ET
+import hashlib
 from urllib.parse import urlsplit
 ROOT=Path(__file__).resolve().parents[1]
 class Links(HTMLParser):
@@ -21,6 +22,8 @@ def main():
     css=(out/'studio.css').read_text(encoding='utf-8')
     for link in re.findall(r'url\([\'\"]?([^\)\'\"]+)',css):assert (out/link).is_file(),link
     assert (out/'art/FONT-LICENSE.txt').is_file()
+    assert (out/'vendor/jsmediatags-LICENSE.md').is_file()
+    assert hashlib.sha256((out/'vendor/jsmediatags.min.js').read_bytes()).hexdigest()=='9eeafeb1eedf87642384ec026a35a387ff36c0f6bb7048c292c79cab03c1b3a9'
     assert 'chatgpt.site' not in (out/'index.html').read_text(encoding='utf-8')
     for path in [out/'index.html',out/'studio.css',out/'studio.js']:
         assert '\ufffd' not in path.read_text(encoding='utf-8'),path

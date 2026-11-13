@@ -3,7 +3,7 @@ import importlib.util
 from pathlib import Path
 import unittest
 
-spec = importlib.util.spec_from_file_location('pairbeat', Path(__file__).resolve().parents[1] / 'integrations/pairbeat_sync.py')
+spec = importlib.util.spec_from_file_location('integrations.pairbeat_sync', Path(__file__).resolve().parents[1] / 'integrations/pairbeat_sync.py')
 p = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(p)
 KEY, CODE = 'fixture-owner-key-not-a-credential', 'fixture-pair-code'
@@ -63,6 +63,15 @@ class GitHub:
 
 
 class PairBeatTests(unittest.TestCase):
+    def test_audio_sent_as_document_is_imported_by_owner(self):
+        gh = GitHub(bound=True)
+        update = message(1)
+        update['message']['document'] = {'file_id': 'test-file', 'file_size': len(MP3), 'file_name': 'KONAET - Test study.mp3'}
+        result = p.synchronize(Telegram([update]), gh, CODE, KEY)
+        self.assertEqual(result['published'], 1)
+        self.assertEqual(gh.files[p.CATALOG_PATH]['tracks'][0]['title'], 'Test study')
+        self.assertEqual(gh.files[p.CATALOG_PATH]['tracks'][0]['artist'], 'KONAET')
+
     def test_pairing_and_owner_upload_in_same_batch(self):
         gh = GitHub()
         result = p.synchronize(Telegram([message(1, text='/start atlas_' + CODE), message(2, audio=True)]), gh, CODE, KEY)
