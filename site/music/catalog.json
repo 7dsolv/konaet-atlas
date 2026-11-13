@@ -5,7 +5,7 @@
     "username": "PairBeat7dsbot",
     "connected": true
   },
-  "updated_at": "2026-11-13T12:03:15.685945+00:00",
+  "updated_at": "2026-11-13T12:18:13.968761+00:00",
   "tracks": [
     {
       "id": "d8acd0ca99a4e7233c1cf331",
@@ -14,6 +14,18 @@
       "duration": 201,
       "url": "https://github.com/7dsolv/konaet-atlas/releases/download/pairbeat-d8acd0ca99a4e7233c1cf331/d8acd0ca99a4e7233c1cf331.m4a",
       "sha256": "d8acd0ca99a4e7233c1cf3317015333d1127593bc0a63851283bbc5fac9fa5ee"
+    },
+    {
+      "id": "9abaaf3bac111d6275d31311",
+      "title": "The Frank - Flow Roxo",
+      "artist": "The Frank",
+      "album": "",
+      "duration": 248.27,
+      "recognition": {
+        "method": "telegram"
+      },
+      "url": "https://github.com/7dsolv/konaet-atlas/releases/download/pairbeat-9abaaf3bac111d6275d31311/9abaaf3bac111d6275d31311.m4a",
+      "sha256": "9abaaf3bac111d6275d31311c1dae78ad78541f144bcb4c771705ccdff631cfb"
     }
   ]
 }
