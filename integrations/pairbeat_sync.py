@@ -82,6 +82,8 @@ def title(value, fallback, maximum=160):
 
 class Telegram:
     def __init__(self, token):
+        if not isinstance(token, str) or not re.fullmatch(r'\d+:[A-Za-z0-9_-]+', token):
+            raise SyncError('Invalid Telegram credential format; value omitted')
         self.token = token
 
     def call(self, method, values=None):

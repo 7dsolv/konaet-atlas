@@ -157,16 +157,21 @@ class PairBeatTests(unittest.TestCase):
         self.assertEqual(gh.deployments, 1)
 
     def test_file_path_cannot_escape_telegram_origin(self):
-        tg = p.Telegram('fixture-not-real')
+        tg = p.Telegram('000000:fixture')
         tg.call = lambda *args: {'file_path': '../secret'}
         with self.assertRaises(p.SyncError):
             tg.download({'file_id': 'fixture', 'file_size': 100})
 
     def test_oversized_audio_is_rejected_before_request(self):
-        tg = p.Telegram('fixture-not-real')
+        tg = p.Telegram('000000:fixture')
         tg.call = lambda *args: self.fail('No API request expected')
         with self.assertRaises(p.InvalidAudio):
             tg.download({'file_id': 'fixture', 'file_size': p.MAX_AUDIO + 1})
+
+    def test_malformed_credential_never_reaches_url_or_error_output(self):
+        with self.assertRaises(p.SyncError) as failure:
+            p.Telegram('private-value\nmalformed')
+        self.assertNotIn('private-value', str(failure.exception))
 
 
 if __name__ == '__main__':
