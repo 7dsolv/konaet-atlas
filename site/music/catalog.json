@@ -3,8 +3,8 @@
   "provider": {
     "name": "PairBeat",
     "username": "PairBeat7dsbot",
-    "connected": false
+    "connected": true
   },
-  "updated_at": null,
+  "updated_at": "2026-11-13T11:49:22.218202+00:00",
   "tracks": []
 }
