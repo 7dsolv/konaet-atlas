@@ -17,6 +17,12 @@ def main():
         if link.startswith('#'):assert link[1:] in p.ids,link
         elif not link.startswith('https://'):assert (out/link).is_file(),link
     source=(out/'studio.js').read_text(encoding='utf-8')
+    css=(out/'studio.css').read_text(encoding='utf-8')
+    for link in re.findall(r'url\([\'\"]?([^\)\'\"]+)',css):assert (out/link).is_file(),link
+    assert (out/'art/FONT-LICENSE.txt').is_file()
+    assert 'chatgpt.site' not in (out/'index.html').read_text(encoding='utf-8')
+    for path in [out/'index.html',out/'studio.css',out/'studio.js']:
+        assert '\ufffd' not in path.read_text(encoding='utf-8'),path
     for id in re.findall(r"\$\(['\"]#([\w-]+)['\"]\)",source):assert id in p.ids,id
     assert 'innerHTML' not in source and 'eval(' not in source
     names={p['name'] for p in json.loads((out/'data/github.json').read_text(encoding='utf-8'))['repos']}
