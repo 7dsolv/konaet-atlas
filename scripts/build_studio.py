@@ -25,12 +25,13 @@ def build():
     if out.exists():shutil.rmtree(out)
     shutil.copytree(ROOT/'site',out)
     shutil.copytree(ROOT/'assets/studio',out/'art')
+    shutil.copytree(ROOT/'assets/prisma',out/'prisma')
     shutil.copytree(ROOT/'publications',out/'publications')
     shutil.copyfile(ROOT/'assets/publication-engineering-guide.svg',out/'art/guide.svg')
     shutil.copyfile(ROOT/'assets/publication-technical-manual.svg',out/'art/manual.svg')
     shutil.copyfile(ROOT/'assets/studio/avatar.png',out/'avatar.png')
     html=(out/'index.html').read_text(encoding='utf-8')
-    for asset in ('studio.css','map.css','map.js','studio.js','vendor/jsmediatags.min.js','music.js'):
+    for asset in ('studio.css','map.css','map.js','prisma.css','prisma-scenes.js','prisma-terminal.js','prisma.js','studio.js','vendor/jsmediatags.min.js','music.js'):
         digest=hashlib.sha256((out/asset).read_bytes()).hexdigest()[:12]
         html=html.replace('"'+asset+'"','"'+asset+'?v='+digest+'"')
     (out/'index.html').write_text(html,encoding='utf-8',newline='\n')

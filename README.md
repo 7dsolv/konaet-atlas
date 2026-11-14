@@ -2,7 +2,9 @@
 
 [**Abrir o Atlas →**](https://7dsolv.github.io/konaet-atlas/) · [Perfil de 7dsolv](https://github.com/7dsolv)
 
-Projetos, código e pesquisa de Adilson Oliveira em uma interface de vidro claro, com desenhos originais em grafite. A seleção inicial reúne oito projetos; a busca também pode percorrer o acervo público do GitHub. O mapa oferece dez relações temáticas entre esses projetos, busca, filtros, foco, zoom e navegação por teclado. As linhas representam afinidades editoriais, não dependências técnicas. Há biblioteca de PDFs, temas claro/escuro e referências salvas no dispositivo.
+Projetos, código e pesquisa de Adilson Oliveira com o sistema visual e os componentes do Prisma Pack: vidro, controles físicos, bordas refrativas e movimento. A seleção inicial reúne oito projetos; a busca também pode percorrer o acervo público do GitHub. O mapa oferece dez relações temáticas, um toro animado de partículas, busca, filtros, foco, zoom e navegação por teclado. As linhas representam afinidades editoriais, não dependências técnicas. Há biblioteca de PDFs, temas claro/escuro e referências salvas no dispositivo.
+
+A área **Prisma** reúne os seis quadros completos adaptados ao Atlas: fundamentos, controles físicos, refrativo, dados e 3D, HUD de jogo e feedback. A aparência, a luz e o movimento são compartilhados com o restante do site. Inclui presets locais com exportação/importação, slider para salvar referências, volume do player, circuito hexagonal editável e executável, inventário e habilidades. O terminal do pack usa dados explicitamente fictícios para demonstrar velas, latência, ofertas, mensagens, fita e funil. As métricas do acervo usam os repositórios carregados. Consulte [a adaptação do pack](docs/PRISMA.md).
 
 A área [Música](https://7dsolv.github.io/konaet-atlas/#music) permite ouvir arquivos locais, um estudo original de demonstração e faixas publicadas pelo PairBeat após vincular o proprietário. Veja [o fluxo, a configuração e os limites](docs/PAIRBEAT.md). A interface tem temas branco/preto de alto contraste, navegação com rótulos maiores e um mapa adaptado para celular.
 
@@ -37,10 +39,10 @@ Os testes de comportamento usam Node.js 24.22.2 e Happy DOM 21.0.4 fixado no loc
 ```sh
 cd tests
 npm ci --ignore-scripts --no-audit --no-fund
-node --test atlas.test.mjs music.test.mjs
+node --test atlas.test.mjs music.test.mjs prisma.test.mjs
 ```
 
-Cobrem seleção e links dos projetos, busca e categorias, navegação entre áreas, salvos, zoom, tema, biblioteca e recuperação de falhas. `scripts/check_atlas.py` verifica os recursos locais, IDs do DOM, SVGs e orçamento de 1,3 MB para toda a distribuição, incluindo PDFs.
+Cobrem seleção e links dos projetos, busca e categorias, navegação, salvos, zoom, tema, biblioteca, recuperação de falhas, preferências Prisma, o circuito, inventário, habilidades, desenho das partículas e simulação do terminal. `scripts/check_atlas.py` verifica os recursos locais, IDs do DOM, SVGs e orçamento de 1,6 MB para toda a distribuição, incluindo PDFs e as três fontes do pack.
 
 Os testes do coletor são executados na raiz, após `python -m pip install --require-hashes -r integrations/requirements.txt`: `python -m unittest discover -s tests -p "test_*.py"`. Não requerem credenciais e não fazem chamadas reais ao Telegram. Consulte também [as dependências de áudio](docs/AUDIO-DEPENDENCIES.md).
 
