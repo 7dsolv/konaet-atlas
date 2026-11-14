@@ -19,18 +19,19 @@ def main():
         if link.startswith('#'):assert link[1:] in p.ids,link
         elif not link.startswith('https://'):assert (out/urlsplit(link).path).is_file(),link
     source=(out/'studio.js').read_text(encoding='utf-8')
-    css=(out/'studio.css').read_text(encoding='utf-8')
+    map_source=(out/'map.js').read_text(encoding='utf-8')
+    css=(out/'studio.css').read_text(encoding='utf-8')+'\n'+(out/'map.css').read_text(encoding='utf-8')
     for link in re.findall(r'url\([\'\"]?([^\)\'\"]+)',css):assert (out/link).is_file(),link
     assert (out/'art/FONT-LICENSE.txt').is_file()
     assert (out/'vendor/jsmediatags-LICENSE.md').is_file()
     assert hashlib.sha256((out/'vendor/jsmediatags.min.js').read_bytes()).hexdigest()=='9eeafeb1eedf87642384ec026a35a387ff36c0f6bb7048c292c79cab03c1b3a9'
     assert 'chatgpt.site' not in (out/'index.html').read_text(encoding='utf-8')
-    for path in [out/'index.html',out/'studio.css',out/'studio.js']:
+    for path in [out/'index.html',out/'studio.css',out/'studio.js',out/'map.css',out/'map.js']:
         assert '\ufffd' not in path.read_text(encoding='utf-8'),path
-    for id in re.findall(r"\$\(['\"]#([\w-]+)['\"]\)",source):assert id in p.ids,id
+    for id in re.findall(r"\$\(['\"]#([\w-]+)['\"]\)",source+map_source):assert id in p.ids,id
     music=(out/'music.js').read_text(encoding='utf-8')
-    assert all('innerHTML' not in s and 'eval(' not in s for s in (source,music))
-    assert not re.search(r'\b\d{6,}:[A-Za-z0-9_-]{25,}',source+music+css)
+    assert all('innerHTML' not in s and 'eval(' not in s for s in (source,map_source,music))
+    assert not re.search(r'\b\d{6,}:[A-Za-z0-9_-]{25,}',source+map_source+music+css)
     catalog=json.loads((out/'music/catalog.json').read_text(encoding='utf-8'))
     assert catalog['schema']==1 and len(catalog['tracks'])<=250
     for track in catalog['tracks']:

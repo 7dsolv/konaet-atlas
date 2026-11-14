@@ -2,7 +2,7 @@
 
 [**Abrir o Atlas →**](https://7dsolv.github.io/konaet-atlas/) · [Perfil de 7dsolv](https://github.com/7dsolv)
 
-Projetos, código e pesquisa de Adilson Oliveira em uma interface de vidro claro, com desenhos originais em grafite. A seleção inicial reúne oito projetos; a busca também pode percorrer o acervo público do GitHub. Há mapa navegável, biblioteca de PDFs, temas claro/escuro e referências salvas no dispositivo.
+Projetos, código e pesquisa de Adilson Oliveira em uma interface de vidro claro, com desenhos originais em grafite. A seleção inicial reúne oito projetos; a busca também pode percorrer o acervo público do GitHub. O mapa oferece dez relações temáticas entre esses projetos, busca, filtros, foco, zoom e navegação por teclado. As linhas representam afinidades editoriais, não dependências técnicas. Há biblioteca de PDFs, temas claro/escuro e referências salvas no dispositivo.
 
 A área [Música](https://7dsolv.github.io/konaet-atlas/#music) permite ouvir arquivos locais, um estudo original de demonstração e faixas publicadas pelo PairBeat após vincular o proprietário. Veja [o fluxo, a configuração e os limites](docs/PAIRBEAT.md). A interface tem temas branco/preto de alto contraste, navegação com rótulos maiores e um mapa adaptado para celular.
 
